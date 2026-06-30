@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const dmarcVal = document.getElementById('dns-dmarc-val');
 
   function updateDNS() {
-    let domain = domainInput.value.trim() || 'weby.guru';
+    let domain = domainInput.value.trim() || 'example.com';
     domain = domain.toLowerCase();
     
     let dkimKey = dkimKeyInput.value.trim() || 'v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0y...';
