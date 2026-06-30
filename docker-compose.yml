@@ -42,6 +42,7 @@ services:
     image: sergeymakinen/postfix_exporter:latest
     container_name: mail-postfix-exporter
     restart: always
+    user: root
     volumes:
       - ./docker-data/mail-logs:/var/log/mail:ro
     command: --file.log /var/log/mail/mail.log
