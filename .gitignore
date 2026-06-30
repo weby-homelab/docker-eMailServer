@@ -1,0 +1,8 @@
+docker-data/
+*.log
+.env
+.backup.env
+mailserver.env
+*.key
+*.pem
+*.txt
