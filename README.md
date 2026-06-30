@@ -1,46 +1,93 @@
-# 📧 Docker Mailserver Stack
+# 📧 Docker eMailServer Stack
 
-Цей репозиторій містить конфігурацію та скрипти для розгортання та адміністрування безпечного поштового сервера на базі [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) на сервері HTZNR.
+[EN](README.md) | [UA](README.ua.md)
 
----
-
-## 🏗️ Структура проєкту
-
-- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Опис сервісу поштового сервера, прокинутих портів та монтування томів.
-- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Налаштування змінних середовища для тюнінгу безпеки (TLS, SpamAssassin, Fail2Ban, тощо).
-- **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Скрипт автоматичної ініціалізації поштових скриньок та генерації DKIM-ключів.
+This repository contains the configuration, scripts, and deployment files for running a secure, hardened mail server based on [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) on the HTZNR host.
 
 ---
 
-## 🔒 Налаштування безпеки & Харденінг
+## 📐 Architecture Overview
 
-Поштовий сервер налаштований за принципом максимальної безпеки:
-1. **Modern TLS**: Параметр `TLS_LEVEL=modern` забезпечує використання лише сучасних та стійких шифрів.
-2. **Антиспам та Антивірус**:
-   - Активовано **SpamAssassin** (`ENABLE_SPAMASSASSIN=1`) для фільтрації спаму.
-   - Інтегровано **Fail2Ban** (`ENABLE_FAIL2BAN=1`) для блокування хостів, що намагаються підібрати паролі.
-3. **SSL/TLS сертифікати**: Монтуються напряму з Let's Encrypt хоста (сертифікат для `srvrs.top`).
-4. **Порти безпеки**:
-   - `25` (SMTP для пересилання між серверами)
-   - `465` (SMTPS - SMTP поверх SSL/TLS)
-   - `587` (Submission - SMTP з автентифікацією)
-   - `993` (IMAPS - IMAP поверх SSL/TLS)
-   - Порт `143` (IMAP) відкритий для внутрішньої сумісності, але трафік має бути зашифрований (STARTTLS).
+Below is the layout of the mail server stack and its interactions:
+
+```mermaid
+graph TD
+    classDef client fill:#3b82f6,stroke:#1d4ed8,stroke-width:2px,color:#fff;
+    classDef host fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff;
+    classDef container fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff;
+    classDef config fill:#f59e0b,stroke:#d97706,stroke-width:2px,color:#fff;
+
+    subgraph Ext ["External Clients & Servers"]
+        MUA["Mail Clients (Outlook, Thunderbird, iOS/Android)"]:::client
+        Senders["External SMTP Servers (Gmail, Outlook, etc.)"]:::client
+    end
+
+    subgraph Host ["HTZNR Host OS"]
+        Firewall["NFTables Firewall (Port Forwarding)"]:::host
+        Certs["Let's Encrypt Certs (/etc/letsencrypt)"]:::config
+    end
+
+    subgraph DMS ["docker-mailserver Container"]
+        Postfix["Postfix SMTP (Ports: 25, 465, 587)"]:::container
+        Dovecot["Dovecot IMAPS (Port: 993)"]:::container
+        SpamAssassin["SpamAssassin (Spam Filter)"]:::container
+        Fail2Ban["Fail2Ban (Brute-force protection)"]:::container
+        OpenDKIM["OpenDKIM (DKIM Signing)"]:::container
+    end
+
+    MUA -->|Ports: 465, 587, 993| Firewall
+    Senders -->|Port: 25| Firewall
+
+    Firewall -->|DNAT 25, 465, 587| Postfix
+    Firewall -->|DNAT 993| Dovecot
+
+    Postfix -->|Scan| SpamAssassin
+    Postfix -->|Sign| OpenDKIM
+    Dovecot -->|Log Auditing| Fail2Ban
+    Postfix -->|Log Auditing| Fail2Ban
+
+    Certs -->|Mounted read-only| Postfix
+    Certs -->|Mounted read-only| Dovecot
+```
 
 ---
 
-## 🚀 Як розгорнути
+## 🏗️ Project Structure
 
-1. Переконайтеся, що на хості налаштовані Let's Encrypt сертифікати для вашого домену у `/etc/letsencrypt`.
-2. Створіть необхідні директорії для зберігання даних:
+- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Standard DMS service definitions, volume binds, and ports mappings.
+- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Environment variables tuning security parameters (TLS configs, enabled modules).
+- **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Automates mailbox creation, accounts config, and DKIM generation.
+
+---
+
+## 🔒 Hardening & Security Features
+
+The mail server runs with maximum security configurations out-of-the-box:
+1. **Modern TLS**: `TLS_LEVEL=modern` forces TLS 1.3 or high-grade TLS 1.2 secure ciphers.
+2. **Brute-force Protection**: **Fail2Ban** is enabled (`ENABLE_FAIL2BAN=1`) to monitor log files and block malicious IPs dynamically.
+3. **Spam Filtering**: **SpamAssassin** is active (`ENABLE_SPAMASSASSIN=1`) to filter incoming spam messages.
+4. **SSL/TLS Certificates**: Mounted directly from Let's Encrypt (`/etc/letsencrypt`) on the host.
+5. **Secure Ports Only**:
+   - `25`: SMTP (Server-to-Server transfer)
+   - `465`: SMTPS (Secure SMTP over SSL/TLS)
+   - `587`: Submission (SMTP with authentication)
+   - `993`: IMAPS (IMAP over SSL/TLS)
+   - **Port 143 (unencrypted IMAP) is disabled** to prevent insecure connection attempts.
+
+---
+
+## 🚀 How to Deploy
+
+1. Make sure your SSL/TLS certificates exist in `/etc/letsencrypt` on the host.
+2. Prepare persistent data folders:
    ```bash
    mkdir -p docker-data/mail-data docker-data/mail-state docker-data/mail-logs docker-data/config
    ```
-3. Запустіть контейнер:
+3. Boot up the services:
    ```bash
    docker compose up -d
    ```
-4. Ініціалізуйте акаунти та згенеруйте DKIM:
+4. Setup email accounts and DKIM keys:
    ```bash
    chmod +x setup-accounts.sh
    ./setup-accounts.sh
@@ -48,6 +95,6 @@
 
 ---
 
-## 📜 Ліцензія
+## 📜 License
 
-Цей проєкт поширюється на умовах ліцензії **GNU GPLv3**. Детальніше див. у файлі [LICENSE](file:///root/geminicli/projects/mail-server/LICENSE).
+This project is licensed under the **GNU GPLv3 License**. See [LICENSE](file:///root/geminicli/projects/mail-server/LICENSE) for details.
