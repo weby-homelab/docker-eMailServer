@@ -57,6 +57,8 @@ graph TD
 - **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Standard DMS service definitions, volume binds, and ports mappings.
 - **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Environment variables tuning security parameters (TLS configs, enabled modules).
 - **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Automates mailbox creation, accounts config, and DKIM generation.
+- **[backup-mail.sh](file:///root/geminicli/projects/mail-server/backup-mail.sh)**: Automated backups helper script using Restic.
+- **[docs/plans/2026-06-30-mailserver-modernization.md](file:///root/geminicli/projects/mail-server/docs/plans/2026-06-30-mailserver-modernization.md)**: Roadmap and planning document for the server modernization.
 
 ---
 
@@ -65,7 +67,7 @@ graph TD
 The mail server runs with maximum security configurations out-of-the-box:
 1. **Modern TLS**: `TLS_LEVEL=modern` forces TLS 1.3 or high-grade TLS 1.2 secure ciphers.
 2. **Brute-force Protection**: **Fail2Ban** is enabled (`ENABLE_FAIL2BAN=1`) to monitor log files and block malicious IPs dynamically.
-3. **Spam Filtering**: **SpamAssassin** is active (`ENABLE_SPAMASSASSIN=1`) to filter incoming spam messages.
+3. **Spam Filtering**: **Rspamd** is enabled (`ENABLE_RSPAMD=1`) as a modern and fast replacement for SpamAssassin.
 4. **SSL/TLS Certificates**: Mounted directly from Let's Encrypt (`/etc/letsencrypt`) on the host.
 5. **Secure Ports Only**:
    - `25`: SMTP (Server-to-Server transfer)
@@ -92,6 +94,17 @@ The mail server runs with maximum security configurations out-of-the-box:
    chmod +x setup-accounts.sh
    ./setup-accounts.sh
    ```
+
+---
+
+## 📈 Modernization Roadmap (Mid-2026)
+
+| Target Feature | Description | Status |
+| :--- | :--- | :--- |
+| **Autoconfig & Autodiscover** | Automatic mail client configuration (Thunderbird/Outlook) | **Configured & Deployed** ✅ |
+| **Encrypted Backups** | Off-site incremental backups of mailboxes using Restic | **Configured** (Script created) ✅ |
+| **Prometheus Exporters** | Exposing postfix-exporter metrics on port 9154 | **Configured & Deployed** ✅ |
+| **Rspamd Migration** | High-performance spam filter and DKIM signing integration | **Configured & Deployed** ✅ |
 
 ---
 
