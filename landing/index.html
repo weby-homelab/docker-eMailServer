@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- SEO & Metadata [06.2026] -->
+  <title>Docker eMailServer — Захищений та Сучасний Поштовий Сервер у Docker 📧</title>
+  <meta name="description" content="Сучасна та безпечна поштова інфраструктура на базі docker-mailserver. Вбудована підтримка TLS 1.3, Rspamd, Fail2Ban, OpenDKIM, Let's Encrypt та моніторингу Prometheus.">
+  <meta name="keywords" content="docker-mailserver, mail server, self-hosted email, postfix, dovecot, rspamd, fail2ban, opendkim, let's encrypt, spf, dkim, dmarc, weby-homelab, ukraine">
+  <meta name="author" content="Weby Homelab">
+  <meta name="robots" content="index, follow">
+  
+  <link rel="canonical" href="https://docker-emailserver.weby.guru/">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg?v=1">
+  <link rel="stylesheet" href="style.css?v=20260630">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://docker-emailserver.weby.guru/">
+  <meta property="og:title" content="Docker eMailServer — Захищений поштовий сервер у Docker">
+  <meta property="og:description" content="Готове до продакшену рішення для запуску приватного поштового сервера із захистом від спаму, автоматичними сертифікатами Let's Encrypt та інтеграцією Prometheus.">
+  <meta property="og:image" content="https://docker-emailserver.weby.guru/favicon.svg?v=1">
+  <meta property="og:site_name" content="Docker eMailServer">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://docker-emailserver.weby.guru/">
+  <meta property="twitter:title" content="Docker eMailServer — Hardened Mail Server Stack">
+  <meta property="twitter:description" content="Secure, high-performance private mail server stack based on docker-mailserver with built-in spam filter and log monitoring.">
+  <meta property="twitter:image" content="https://docker-emailserver.weby.guru/favicon.svg?v=1">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "docker-eMailServer",
+    "operatingSystem": "Linux",
+    "applicationCategory": "BusinessApplication",
+    "description": "Hardened and modernized private mail server stack based on docker-mailserver, pre-configured with Let's Encrypt, Rspamd, Fail2Ban, OpenDKIM, Autoconfig, and Prometheus metrics.",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "Weby Homelab"
+    }
+  }
+  </script>
+</head>
+<body class="lang-ua">
+
+  <!-- Navigation Header -->
+  <header>
+    <div class="container nav-container">
+      <a href="#home" class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="logo-glow">Docker</span>-eMailServer
+      </a>
+      <nav>
+        <ul>
+          <li>
+            <a href="#home" class="active">
+              <span class="lang-en">Home</span>
+              <span class="lang-ua">Головна</span>
+            </a>
+          </li>
+          <li>
+            <a href="#architecture">
+              <span class="lang-en">Architecture</span>
+              <span class="lang-ua">Архітектура</span>
+            </a>
+          </li>
+          <li>
+            <a href="#quickstart">
+              <span class="lang-en">Quick Start</span>
+              <span class="lang-ua">Швидкий Старт</span>
+            </a>
+          </li>
+          <li>
+            <a href="#dashboards">
+              <span class="lang-en">Dashboards</span>
+              <span class="lang-ua">Панелі & Метрики</span>
+            </a>
+          </li>
+          <li>
+            <a href="#hardening">
+              <span class="lang-en">Security</span>
+              <span class="lang-ua">Безпека</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <!-- Language Switcher -->
+        <div class="lang-switcher">
+          <button class="lang-btn" data-lang="en">EN</button>
+          <span class="lang-separator">|</span>
+          <button class="lang-btn active" data-lang="ua">UA</button>
+        </div>
+
+        <a href="https://github.com/weby-homelab/docker-eMailServer" target="_blank" class="btn btn-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="home" class="hero">
+    <div class="hero-glow-sphere"></div>
+    <div class="container animate-fade-in-up">
+      <div class="hero-logo-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="url(#logo-grad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <defs>
+            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#06b6d4" />
+              <stop offset="100%" stop-color="#7c3aed" />
+            </linearGradient>
+          </defs>
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+      </div>
+
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span class="lang-en">Hardened Mail Server Stack [06.2026]</span>
+        <span class="lang-ua">Захищений Поштовий Стек [06.2026]</span>
+      </div>
+
+      <h1 class="lang-en">Hardened Private Mail Server<br>Simplified in Docker</h1>
+      <h1 class="lang-ua">Захищений Поштовий Сервер<br>в Один Крок у Docker</h1>
+
+      <p class="lang-en">A fully automated, high-security email infrastructure wrapper on top of docker-mailserver. Preconfigured with Rspamd spam-filtering, Fail2Ban protection, OpenDKIM signatures, Let's Encrypt certificates, and Prometheus performance metrics.</p>
+      <p class="lang-ua">Повністю автоматизована та безпечна поштова інфраструктура на базі docker-mailserver. Готова конфігурація з фільтрацією спаму Rspamd, захистом Fail2Ban, підписами OpenDKIM, SSL Let's Encrypt та метриками Prometheus.</p>
+
+      <div class="hero-actions">
+        <a href="#quickstart" class="btn btn-primary btn-lg btn-panel-trigger">
+          <span class="lang-en">Quick Start Guide</span>
+          <span class="lang-ua">Швидкий Старт</span>
+        </a>
+        <a href="#architecture" class="btn btn-secondary btn-lg btn-panel-trigger">
+          <span class="lang-en">View Architecture</span>
+          <span class="lang-ua">Архітектура Стеку</span>
+        </a>
+      </div>
+
+      <!-- Quick Command Block -->
+      <div class="install-box">
+        <div class="install-cmd" id="quick-run-cmd">
+          <span>$</span>curl -sSL https://raw.githubusercontent.com/weby-homelab/docker-eMailServer/main/install.sh | bash
+        </div>
+        <button class="copy-btn" data-copy-target="quick-run-cmd" aria-label="Copy installation command">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+            <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+          </svg>
+          <div class="copy-tooltip">
+            <span class="lang-en">Copied!</span>
+            <span class="lang-ua">Скопійовано!</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture Section -->
+  <section id="architecture" class="tab-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="lang-en">Architecture & Mail Flow</h2>
+        <h2 class="lang-ua">Архітектура та Рух Листів</h2>
+        <p class="lang-en">Understanding how mail traffic enters, is filtered, and is securely delivered to endpoints.</p>
+        <p class="lang-ua">Як поштовий трафік потрапляє на сервер, проходить фільтрацію та безпечно зберігається.</p>
+      </div>
+
+      <div class="architecture-container">
+        <!-- SVG Diagram mimicking the mermaid flow -->
+        <div class="diagram-wrapper glass-panel">
+          <svg viewBox="0 0 800 400" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg">
+            <!-- Definitions for gradients -->
+            <defs>
+              <linearGradient id="grad-client" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#06b6d4" />
+                <stop offset="100%" stop-color="#0891b2" />
+              </linearGradient>
+              <linearGradient id="grad-host" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="100%" stop-color="#059669" />
+              </linearGradient>
+              <linearGradient id="grad-container" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed" />
+                <stop offset="100%" stop-color="#6d28d9" />
+              </linearGradient>
+              <linearGradient id="grad-arrow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#94a3b8" />
+                <stop offset="100%" stop-color="#64748b" />
+              </linearGradient>
+            </defs>
+
+            <!-- External Block -->
+            <rect x="20" y="20" width="220" height="360" rx="10" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <text x="30" y="45" fill="#64748b" font-size="12" font-family="Outfit" font-weight="600">EXTERNAL CLIENTS</text>
+
+            <rect x="40" y="80" width="180" height="70" rx="8" fill="url(#grad-client)" stroke="rgba(255,255,255,0.1)" />
+            <text x="50" y="110" fill="#fff" font-size="13" font-family="Inter" font-weight="600">Mail Clients (MUAs)</text>
+            <text x="50" y="130" fill="rgba(255,255,255,0.8)" font-size="11" font-family="Fira Code">Outlook, iOS, etc.</text>
+
+            <rect x="40" y="220" width="180" height="70" rx="8" fill="url(#grad-client)" stroke="rgba(255,255,255,0.1)" />
+            <text x="50" y="250" fill="#fff" font-size="13" font-family="Inter" font-weight="600">External SMTPs</text>
+            <text x="50" y="270" fill="rgba(255,255,255,0.8)" font-size="11" font-family="Fira Code">Gmail, Outlook, etc.</text>
+
+            <!-- Host OS Block -->
+            <rect x="290" y="20" width="180" height="360" rx="10" fill="rgba(255,255,255,0.01)" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <text x="300" y="45" fill="#64748b" font-size="12" font-family="Outfit" font-weight="600">HOST OS</text>
+
+            <rect x="310" y="80" width="140" height="70" rx="8" fill="url(#grad-host)" stroke="rgba(255,255,255,0.1)" />
+            <text x="320" y="110" fill="#fff" font-size="13" font-family="Inter" font-weight="600">NFTables</text>
+            <text x="320" y="130" fill="rgba(255,255,255,0.8)" font-size="11" font-family="Fira Code">Port Forwarding</text>
+
+            <rect x="310" y="220" width="140" height="70" rx="8" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" />
+            <text x="320" y="250" fill="#fff" font-size="13" font-family="Inter" font-weight="600">Let's Encrypt</text>
+            <text x="320" y="270" fill="#94a3b8" font-size="11" font-family="Fira Code">Certs Sync</text>
+
+            <!-- docker-mailserver Container Block -->
+            <rect x="520" y="20" width="260" height="360" rx="10" fill="rgba(255,255,255,0.02)" stroke="rgba(124, 58, 237, 0.15)" stroke-width="1.5"/>
+            <text x="530" y="45" fill="#7c3aed" font-size="12" font-family="Outfit" font-weight="600">DMS CONTAINER</text>
+
+            <rect x="540" y="70" width="220" height="50" rx="6" fill="url(#grad-container)" stroke="rgba(255,255,255,0.1)" />
+            <text x="550" y="95" fill="#fff" font-size="12" font-family="Inter" font-weight="600">Postfix (SMTP/Submission)</text>
+            <text x="550" y="110" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Fira Code">Ports: 25, 465, 587</text>
+
+            <rect x="540" y="130" width="220" height="50" rx="6" fill="url(#grad-container)" stroke="rgba(255,255,255,0.1)" />
+            <text x="550" y="155" fill="#fff" font-size="12" font-family="Inter" font-weight="600">Dovecot (IMAPS)</text>
+            <text x="550" y="170" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Fira Code">Port: 993</text>
+
+            <rect x="540" y="190" width="220" height="50" rx="6" fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.05)" />
+            <text x="550" y="215" fill="#f8fafc" font-size="12" font-family="Inter" font-weight="600">Rspamd (Spam Filter)</text>
+            <text x="550" y="230" fill="#94a3b8" font-size="10" font-family="Fira Code">Bayes & SPF/DKIM check</text>
+
+            <rect x="540" y="250" width="220" height="50" rx="6" fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.05)" />
+            <text x="550" y="275" fill="#f8fafc" font-size="12" font-family="Inter" font-weight="600">Fail2Ban (Brute-force)</text>
+            <text x="550" y="290" fill="#94a3b8" font-size="10" font-family="Fira Code">Log Monitor</text>
+
+            <rect x="540" y="310" width="220" height="50" rx="6" fill="rgba(255, 255, 255, 0.03)" stroke="rgba(255,255,255,0.05)" />
+            <text x="550" y="335" fill="#f8fafc" font-size="12" font-family="Inter" font-weight="600">OpenDKIM (Signing)</text>
+            <text x="550" y="350" fill="#94a3b8" font-size="10" font-family="Fira Code">Outgoing Mail Sign</text>
+
+            <!-- Arrows -->
+            <path d="M 220 115 L 310 115" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 220 255 L 310 115" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 450 115 L 540 95" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 450 115 L 540 155" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+            <path d="M 380 220 L 380 150" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4" fill="none" />
+            <path d="M 450 255 L 540 170" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4" fill="none" />
+          </svg>
+        </div>
+
+        <div class="arch-steps">
+          <div class="arch-step-card glass-panel">
+            <div class="arch-step-num">01</div>
+            <h4 class="lang-en">Inbound Routing</h4>
+            <h4 class="lang-ua">Вхідна Маршрутизація</h4>
+            <p class="lang-en">NFTables routes external traffic securely from WAN ports directly into DMS containers, keeping host safe.</p>
+            <p class="lang-ua">NFTables надійно перенаправляє зовнішній трафік із портів 25, 465, 587, 993 прямо в контейнер.</p>
+          </div>
+
+          <div class="arch-step-card glass-panel">
+            <div class="arch-step-num">02</div>
+            <h4 class="lang-en">Spam & Virus Filters</h4>
+            <h4 class="lang-ua">Фільтрація Спаму</h4>
+            <p class="lang-en">Rspamd performs multi-metric analysis (SPF, DKIM, DMARC, DNSBL, Bayes) to block malicious mail instantly.</p>
+            <p class="lang-ua">Rspamd аналізує листи за багатьма метриками (SPF, DKIM, DMARC, DNSBL) для миттєвого блокування спаму.</p>
+          </div>
+
+          <div class="arch-step-card glass-panel">
+            <div class="arch-step-num">03</div>
+            <h4 class="lang-en">SSL/TLS Encryption</h4>
+            <h4 class="lang-ua">SSL/TLS Шифрування</h4>
+            <p class="lang-en">Let's Encrypt certificates are mounted read-only to ensure absolute privacy and fully secure client logins.</p>
+            <p class="lang-ua">Сертифікати Let's Encrypt монтуються в режимі read-only для шифрування підключень клієнтів.</p>
+          </div>
+
+          <div class="arch-step-card glass-panel">
+            <div class="arch-step-num">04</div>
+            <h4 class="lang-en">Active Protection</h4>
+            <h4 class="lang-ua">Активний Захист</h4>
+            <p class="lang-en">Fail2Ban monitors audit logs and automatically updates firewall tables to drop brute-force botnets.</p>
+            <p class="lang-ua">Fail2Ban сканує системні логи та блокує IP-адреси зловмисників за спроби підбору паролів.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start Section -->
+  <section id="quickstart" class="tab-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="lang-en">Deployment & Quick Start</h2>
+        <h2 class="lang-ua">Встановлення та Налаштування</h2>
+        <p class="lang-en">Deploy your own mail server cluster in three simple steps.</p>
+        <p class="lang-ua">Запустіть власний поштовий сервер всього за три простих кроки.</p>
+      </div>
+
+      <div class="step-layout">
+        <!-- Step 1 -->
+        <div class="step-row">
+          <div class="step-num-col">
+            <div class="step-badge">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body-col">
+            <h3 class="lang-en">Clone & Prepare Workspace</h3>
+            <h3 class="lang-ua">Клонування та Підготовка Репозиторію</h3>
+            <p class="lang-en">Clone the mail server repository and switch to the project directory:</p>
+            <p class="lang-ua">Завантажте репозиторій на свій сервер:</p>
+            <div class="code-block">
+              <div class="code-text" id="git-clone-cmd">git clone https://github.com/weby-homelab/docker-eMailServer.git && cd docker-eMailServer</div>
+              <button class="copy-btn" data-copy-target="git-clone-cmd">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                </svg>
+                <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="step-row">
+          <div class="step-num-col">
+            <div class="step-badge">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body-col">
+            <h3 class="lang-en">Run Automated Installation</h3>
+            <h3 class="lang-ua">Запуск Автоматичного Встановлення</h3>
+            <p class="lang-en">Use the pre-packaged shell installer to initialize directories, templates, and config files:</p>
+            <p class="lang-ua">Виконайте інсталяційний скрипт для конфігурації папок та середовища:</p>
+            <div class="code-block">
+              <div class="code-text" id="install-sh-cmd">chmod +x install.sh && ./install.sh</div>
+              <button class="copy-btn" data-copy-target="install-sh-cmd">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+                </svg>
+                <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="step-row">
+          <div class="step-num-col">
+            <div class="step-badge">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-body-col">
+            <h3 class="lang-en">Configure DNS Records</h3>
+            <h3 class="lang-ua">Налаштування Записів DNS</h3>
+            <p class="lang-en">To ensure maximum deliverability and SPF/DKIM/DMARC pass, enter your domain below to generate the exact DNS configurations:</p>
+            <p class="lang-ua">Для того, щоб листи не потрапляли в спам, введіть свій домен нижче для генерації точних налаштувань DNS записів:</p>
+            
+            <!-- DNS generator widget -->
+            <div class="dns-widget">
+              <div class="dns-inputs">
+                <div class="input-group">
+                  <label class="input-label" for="dns-domain-input">
+                    <span class="lang-en">Domain Name</span>
+                    <span class="lang-ua">Доменне Ім'я</span>
+                  </label>
+                  <input type="text" id="dns-domain-input" class="text-input" value="weby.guru" placeholder="example.com">
+                </div>
+                <div class="input-group">
+                  <label class="input-label" for="dns-dkim-input">
+                    <span class="lang-en">DKIM Key Selector Text</span>
+                    <span class="lang-ua">Текст DKIM Ключа</span>
+                  </label>
+                  <input type="text" id="dns-dkim-input" class="text-input" value="v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0y..." placeholder="v=DKIM1...">
+                </div>
+              </div>
+
+              <div class="dns-table-container">
+                <table class="dns-table">
+                  <thead>
+                    <tr>
+                      <th><span class="lang-en">Type</span><span class="lang-ua">Тип</span></th>
+                      <th><span class="lang-en">Host/Name</span><span class="lang-ua">Хост/Ім'я</span></th>
+                      <th><span class="lang-en">Value</span><span class="lang-ua">Значення</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="dns-type-badge">MX</span></td>
+                      <td><code>@</code></td>
+                      <td><code id="dns-mx-val">10 mail.weby.guru.</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="dns-type-badge">TXT</span></td>
+                      <td><code>@</code></td>
+                      <td><code id="dns-spf-val" class="dns-cell-val">v=spf1 mx ip4:YOUR_SERVER_IP -all</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="dns-type-badge">TXT</span></td>
+                      <td><code id="dns-dkim-host-val">mail._domainkey.weby.guru.</code></td>
+                      <td><code id="dns-dkim-key-val" class="dns-cell-val">v=DKIM1; k=rsa; p=...</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="dns-type-badge">TXT</span></td>
+                      <td><code id="dns-dmarc-host-val">_dmarc.weby.guru.</code></td>
+                      <td><code id="dns-dmarc-val" class="dns-cell-val">v=DMARC1; p=reject; pct=100; rua=mailto:dmarc@weby.guru</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboards Section -->
+  <section id="dashboards" class="tab-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="lang-en">Admin Dashboards & Monitoring</h2>
+        <h2 class="lang-ua">Панелі Управління та Моніторинг</h2>
+        <p class="lang-en">Monitor mail queues, statistics, spam ratios, and resources in real time.</p>
+        <p class="lang-ua">Відстежуйте черги листів, статистику спаму та навантаження в реальному часі.</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- Dashboard Card 1 -->
+        <div class="card glass-panel">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          </div>
+          <h3 class="lang-en">Rspamd Web UI Admin Panel</h3>
+          <h3 class="lang-ua">Rspamd Web UI Панель</h3>
+          <p class="lang-en">Rspamd features an advanced dynamic interface to view spam scores, learn filters, and scan headers. For security, it binds only to localhost.</p>
+          <p class="lang-ua">Rspamd надає потужну динамічну панель для перегляду оцінок спаму, навчання фільтра та сканування заголовків. З метою безпеки панель прив'язана лише до localhost.</p>
+          
+          <div class="code-block" style="margin-top: 1.5rem; margin-bottom: 0;">
+            <div class="code-text" id="ssh-tunnel-cmd" style="font-size:0.75rem;">ssh -N -L 11334:127.0.0.1:11334 root@mail.weby.guru</div>
+            <button class="copy-btn" data-copy-target="ssh-tunnel-cmd">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+              </svg>
+              <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+            </button>
+          </div>
+          <span style="display:block; margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted);">
+            <span class="lang-en">Then navigate to: <code>http://localhost:11334</code></span>
+            <span class="lang-ua">Після цього відкрийте: <code>http://localhost:11334</code></span>
+          </span>
+        </div>
+
+        <!-- Dashboard Card 2 -->
+        <div class="card glass-panel">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-line-chart"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          </div>
+          <h3 class="lang-en">Prometheus & Grafana Integration</h3>
+          <h3 class="lang-ua">Інтеграція Prometheus & Grafana</h3>
+          <p class="lang-en">Exposes Postfix metrics via <code>postfix-exporter</code> on port <code>9154</code>. Allows instant scraping and connection to dynamic dashboard suites.</p>
+          <p class="lang-ua">Експортує метрики пошти через <code>postfix-exporter</code> на порту <code>9154</code>. Дозволяє миттєво підключити Grafana для візуалізації графіків трафіку.</p>
+          
+          <span style="display:block; margin-top:1.5rem; font-size:0.85rem; color:var(--text-secondary);">
+            <span class="lang-en">🚀 Grafana Dashboard Template ID: <a href="https://grafana.com/grafana/dashboards/10013-postfix/" target="_blank" style="color:var(--secondary); text-decoration:underline;">10013</a></span>
+            <span class="lang-ua">🚀 ID шаблону дашборду Grafana: <a href="https://grafana.com/grafana/dashboards/10013-postfix/" target="_blank" style="color:var(--secondary); text-decoration:underline;">10013</a></span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Hardening Section -->
+  <section id="hardening" class="tab-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="lang-en">Hardening & Security Features</h2>
+        <h2 class="lang-ua">Захист та Безпека</h2>
+        <p class="lang-en">The stack runs maximum security configurations out-of-the-box.</p>
+        <p class="lang-ua">Конфігурації стеку налаштовані на максимальну безпеку з коробки.</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Feature 1 -->
+        <div class="card glass-panel">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield-check"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3 class="lang-en">Modern TLS 1.3</h3>
+          <h3 class="lang-ua">Сучасний TLS 1.3</h3>
+          <p class="lang-en">Enforces modern encryption layers only. Weak ciphers are disabled to prevent SSL handshake leaks and downgrade attacks.</p>
+          <p class="lang-ua">Використовує лише сучасні шифри. Слабкі алгоритми примусово вимкнено для захисту з'єднань від компрометації.</p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="card glass-panel">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-x"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="22" y2="13"/><line x1="22" y1="8" x2="17" y2="13"/></svg>
+          </div>
+          <h3 class="lang-en">Fail2Ban Active Defense</h3>
+          <h3 class="lang-ua">Fail2Ban Захист</h3>
+          <p class="lang-en">Fail2Ban monitors log outputs in real time, automatically dropping IPs attempting SMTP brute-force or dictionary sweeps.</p>
+          <p class="lang-ua">Автоматично сканує поштові логи та миттєво блокує ботнети при спробах підбору паролів до скриньок.</p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="card glass-panel">
+          <div class="card-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-server-crash"><path d="M6 16h.01"/><path d="M10 16h.01"/><path d="M14 16h.01"/><path d="M18 16h.01"/><rect width="20" height="8" x="2" y="12" rx="2"/><path d="M6 8h.01"/><path d="M10 8h.01"/><path d="M14 8h.01"/><path d="M18 8h.01"/><rect width="20" height="8" x="2" y="4" rx="2"/><path d="m2 8 20 8"/></svg>
+          </div>
+          <h3 class="lang-en">rDNS / HELO Mandate</h3>
+          <h3 class="lang-ua">Вимога rDNS / HELO</h3>
+          <p class="lang-en">Strict checks ensure EHLO/HELO names align with server PTR pointer records, boosting sender reputation to 10/10.</p>
+          <p class="lang-ua">Суворе узгодження вихідного EHLO/HELO хостнейма із PTR записом IP поштового сервера забезпечує рейтинг відправки 10/10.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Col 1 -->
+        <div class="footer-col">
+          <h4 class="lang-en">Navigation</h4>
+          <h4 class="lang-ua">Навігація</h4>
+          <ul>
+            <li><a href="#home" class="btn-panel-trigger"><span class="lang-en">Home</span><span class="lang-ua">Головна</span></a></li>
+            <li><a href="#architecture" class="btn-panel-trigger"><span class="lang-en">Architecture</span><span class="lang-ua">Архітектура</span></a></li>
+            <li><a href="#quickstart" class="btn-panel-trigger"><span class="lang-en">Quick Start</span><span class="lang-ua">Швидкий Старт</span></a></li>
+            <li><a href="#dashboards" class="btn-panel-trigger"><span class="lang-en">Dashboards</span><span class="lang-ua">Панелі</span></a></li>
+            <li><a href="#hardening" class="btn-panel-trigger"><span class="lang-en">Security</span><span class="lang-ua">Безпека</span></a></li>
+          </ul>
+        </div>
+        
+        <!-- Col 2 -->
+        <div class="footer-col">
+          <h4 class="lang-en">Landings Directory</h4>
+          <h4 class="lang-ua">Лендінги Проєктів</h4>
+          <ul>
+            <li><a href="https://qrank.weby.guru/" target="_blank">Weby-QRank</a></li>
+            <li><a href="https://ai.weby.guru/" target="_blank">AI-HomeLab</a></li>
+            <li><a href="https://safety-chat-bot.weby.guru/" target="_blank">Safety-Chat-Bot</a></li>
+            <li><a href="https://POWER.srvrs.top" target="_blank">Power Safety UA</a></li>
+            <li><a href="https://antigravity-cli-statusline.weby.guru/" target="_blank">Agy Statusline</a></li>
+            <li><a href="https://ECOBOT-2.srvrs.top" target="_blank">Air Quality Dashboard</a></li>
+            <li><a href="https://docker-emailserver.weby.guru/" class="active">Docker eMailServer</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3 -->
+        <div class="footer-col">
+          <h4 class="lang-en">GitHub Repositories</h4>
+          <h4 class="lang-ua">Гітхаб Репозиторії</h4>
+          <ul>
+            <li><a href="https://github.com/Weby-Homelab/ADBlock-PD" target="_blank">ADBlock-PD</a></li>
+            <li><a href="https://github.com/Weby-Homelab/niftywall" target="_blank">NiftyWall</a></li>
+            <li><a href="https://github.com/Weby-Homelab/firewalld-gui" target="_blank">Firewalld-GUI</a></li>
+            <li><a href="https://github.com/Weby-Homelab/ufw-gui" target="_blank">UFW-GUI</a></li>
+            <li><a href="https://github.com/Weby-Homelab/docker-mailserver-gui" target="_blank">docker-mailserver-gui</a></li>
+            <li><a href="https://github.com/Weby-Homelab/wg-easy" target="_blank">WG-Easy</a></li>
+            <li><a href="https://github.com/Weby-Homelab/homelab" target="_blank">Homelab IaC</a></li>
+            <li><a href="https://github.com/Weby-Homelab/voip-installer" target="_blank">VoIP Installer</a></li>
+            <li><a href="https://github.com/weby-homelab/weby-antigravity-cli" target="_blank">weby-antigravity-cli</a></li>
+            <li><a href="https://github.com/weby-homelab/dockhand" target="_blank">Dockhand</a></li>
+            <li><a href="https://github.com/weby-homelab/beszel" target="_blank">Beszel</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4 -->
+        <div class="footer-col">
+          <h4 class="lang-en">Contacts & Socials</h4>
+          <h4 class="lang-ua">Контакти та Соцмережі</h4>
+          <ul>
+            <li><a href="https://github.com/weby-homelab" target="_blank">GitHub Profile</a></li>
+            <li><a href="https://t.me/weby_homelab" target="_blank">Telegram Channel</a></li>
+            <li><a href="mailto:contact@srvrs.top" target="_blank">Email: contact@srvrs.top</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-copy lang-en">
+          &copy; 2026 Weby Homelab. All rights reserved.
+        </div>
+        <div class="footer-copy lang-ua">
+          &copy; 2026 Weby Homelab. Всі права захищено.
+        </div>
+        <div class="footer-credit lang-en">
+          Sovereign local computing in Ukraine under air sirens & blackouts <span class="heart-icon">⚡</span>
+        </div>
+        <div class="footer-credit lang-ua">
+          Суверенні локальні обчислення в Україні під виття сирен та блекаути <span class="heart-icon">⚡</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js?v=20260630"></script>
+  
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
