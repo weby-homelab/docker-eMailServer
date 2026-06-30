@@ -39,10 +39,11 @@ services:
       - "127.0.0.1:8000:80"
 
   postfix-exporter:
-    image: kumina/postfix-exporter:latest
+    image: sergeymakinen/postfix_exporter:latest
     container_name: mail-postfix-exporter
     restart: always
     volumes:
       - ./docker-data/mail-logs:/var/log/mail:ro
+    command: --file.log /var/log/mail/mail.log
     ports:
-      - "127.0.0.1:9154:9154"
+      - "127.0.0.1:9154:9907"
