@@ -322,7 +322,8 @@ nav a:hover::after, nav a.active::after {
 }
 
 .hero-logo-container {
-  display: inline-flex;
+  display: flex;
+  margin: 0 auto 2rem;
   justify-content: center;
   align-items: center;
   width: 90px;
@@ -331,7 +332,6 @@ nav a:hover::after, nav a.active::after {
   background: radial-gradient(circle, rgba(124, 58, 237, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: var(--shadow-lg), 0 0 20px rgba(6, 182, 212, 0.1);
-  margin-bottom: 2rem;
 }
 
 .hero-logo-container svg {
