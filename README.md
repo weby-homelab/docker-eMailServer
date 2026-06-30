@@ -1,6 +1,6 @@
-# 📧 Docker Mailserver Stack (Weby Homelab)
+# 📧 Docker Mailserver Stack
 
-Цей репозиторій містить конфігурацію та скрипти для розгортання та адміністрування безпечного поштового сервера на базі [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) у екосистемі **Weby Homelab** на сервері HTZNR.
+Цей репозиторій містить конфігурацію та скрипти для розгортання та адміністрування безпечного поштового сервера на базі [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) на сервері HTZNR.
 
 ---
 
