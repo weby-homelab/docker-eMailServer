@@ -2,7 +2,7 @@
 
 [EN](README.md) | [UA](README.ua.md)
 
-This repository contains the configuration, scripts, and deployment files for running a secure, hardened mail server based on [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) on the HTZNR host.
+This repository contains the configuration, scripts, and deployment files for running a secure, hardened, and modernized mail server based on [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) on the HTZNR host.
 
 ---
 
@@ -54,11 +54,27 @@ graph TD
 
 ## 🏗️ Project Structure
 
-- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Standard DMS service definitions, volume binds, and ports mappings.
-- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Environment variables tuning security parameters (TLS configs, enabled modules).
+- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: DMS service definitions with integrated Autoconfig and Postfix Exporter containers.
+- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Environment variables tuning security parameters (enables Rspamd, TLS modern, disables SpamAssassin).
 - **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Automates mailbox creation, accounts config, and DKIM generation.
 - **[backup-mail.sh](file:///root/geminicli/projects/mail-server/backup-mail.sh)**: Automated backups helper script using Restic.
-- **[docs/plans/2026-06-30-mailserver-modernization.md](file:///root/geminicli/projects/mail-server/docs/plans/2026-06-30-mailserver-modernization.md)**: Roadmap and planning document for the server modernization.
+- **[install.sh](file:///root/geminicli/projects/mail-server/install.sh)**: Single-command installer script.
+
+---
+
+## ⚡ Quick Start (One-Command Installation)
+
+You can clone, configure directories, and deploy the entire mail stack with a single command:
+
+**Using curl:**
+```bash
+curl -sSL https://raw.githubusercontent.com/weby-homelab/docker-eMailServer/main/install.sh | bash
+```
+
+**Using wget:**
+```bash
+wget -qO- https://raw.githubusercontent.com/weby-homelab/docker-eMailServer/main/install.sh | bash
+```
 
 ---
 
@@ -78,33 +94,12 @@ The mail server runs with maximum security configurations out-of-the-box:
 
 ---
 
-## 🚀 How to Deploy
+## 📈 Implemented Modernizations (06.2026)
 
-1. Make sure your SSL/TLS certificates exist in `/etc/letsencrypt` on the host.
-2. Prepare persistent data folders:
-   ```bash
-   mkdir -p docker-data/mail-data docker-data/mail-state docker-data/mail-logs docker-data/config
-   ```
-3. Boot up the services:
-   ```bash
-   docker compose up -d
-   ```
-4. Setup email accounts and DKIM keys:
-   ```bash
-   chmod +x setup-accounts.sh
-   ./setup-accounts.sh
-   ```
-
----
-
-## 📈 Modernization Roadmap (Mid-2026)
-
-| Target Feature | Description | Status |
-| :--- | :--- | :--- |
-| **Autoconfig & Autodiscover** | Automatic mail client configuration (Thunderbird/Outlook) | **Configured & Deployed** ✅ |
-| **Encrypted Backups** | Off-site incremental backups of mailboxes using Restic | **Configured** (Script created) ✅ |
-| **Prometheus Exporters** | Exposing postfix-exporter metrics on port 9154 | **Configured & Deployed** ✅ |
-| **Rspamd Migration** | High-performance spam filter and DKIM signing integration | **Configured & Deployed** ✅ |
+- **Autoconfig & Autodiscover**: Automatic mail client configuration for Thunderbird and Outlook is running via `mail-autoconfig` container on port `8000` (localhost).
+- **Encrypted Backups**: Off-site incremental backups of mailboxes and configs are configured via Restic (run `./backup-mail.sh`).
+- **Prometheus Exporter**: Mail metrics are exposed on port `9154` (localhost) via `sergeymakinen/postfix_exporter` running under root permissions.
+- **Rspamd Integration**: Spam filtering and DKIM/DMARC signing are fully integrated and running.
 
 ---
 

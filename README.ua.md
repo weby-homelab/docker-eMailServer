@@ -2,7 +2,7 @@
 
 [EN](README.md) | [UA](README.ua.md)
 
-Цей репозиторій містить конфігурацію, скрипти та файли розгортання для запуску безпечного, захищеного поштового сервера на базі [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) на хості HTZNR.
+Цей репозиторій містить конфігурацію, скрипти та файли розгортання для запуску безпечного, захищеного та модернізованого поштового сервера на базі [docker-mailserver](https://github.com/docker-mailserver/docker-mailserver) на хості HTZNR.
 
 ---
 
@@ -54,11 +54,27 @@ graph TD
 
 ## 🏗️ Структура проекту
 
-- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Опис Docker-сервісів, портів та монтування томів.
-- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Змінні середовища для налаштування безпеки (TLS, включені модулі).
+- **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Опис Docker-сервісів із вбудованими контейнерами Autoconfig та Postfix Exporter.
+- **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Змінні середовища для налаштування безпеки (TLS, включено Rspamd, вимкнено SpamAssassin).
 - **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Скрипт автоматичного створення поштових скриньок та генерації DKIM-ключів.
 - **[backup-mail.sh](file:///root/geminicli/projects/mail-server/backup-mail.sh)**: Допоміжний скрипт автоматичного резервного копіювання за допомогою Restic.
-- **[docs/plans/2026-06-30-mailserver-modernization.md](file:///root/geminicli/projects/mail-server/docs/plans/2026-06-30-mailserver-modernization.md)**: Документ планування та дорожня карта модернізації сервера.
+- **[install.sh](file:///root/geminicli/projects/mail-server/install.sh)**: Скрипт автоматичного встановлення та запуску стеку.
+
+---
+
+## ⚡ Швидкий запуск (Встановлення однією командою)
+
+Ви можете клонувати репозиторій, створити необхідні директорії та запустити весь поштовий стек однією командою:
+
+**Через curl:**
+```bash
+curl -sSL https://raw.githubusercontent.com/weby-homelab/docker-eMailServer/main/install.sh | bash
+```
+
+**Через wget:**
+```bash
+wget -qO- https://raw.githubusercontent.com/weby-homelab/docker-eMailServer/main/install.sh | bash
+```
 
 ---
 
@@ -78,33 +94,12 @@ graph TD
 
 ---
 
-## 🚀 Як розгорнути
+## 📈 Впроваджені покращення (06.2026)
 
-1. Переконайтеся, що на хості існують сертифікати у `/etc/letsencrypt`.
-2. Створіть директорії для збереження даних:
-   ```bash
-   mkdir -p docker-data/mail-data docker-data/mail-state docker-data/mail-logs docker-data/config
-   ```
-3. Запустіть контейнер:
-   ```bash
-   docker compose up -d
-   ```
-4. Створіть акаунти та DKIM-ключі:
-   ```bash
-   chmod +x setup-accounts.sh
-   ./setup-accounts.sh
-   ```
-
----
-
-## 📈 Дорожня карта модернізації (Середина 2026)
-
-| Напрямок покращення | Опис | Статус |
-| :--- | :--- | :--- |
-| **Autoconfig & Autodiscover** | Автоналаштування поштових клієнтів (Thunderbird/Outlook) | **Налаштовано та впроваджено** ✅ |
-| **Шифровані бекапи** | Інкрементне резервне копіювання скриньок на хмару через Restic | **Конфігуровано** (Скрипт створено) ✅ |
-| **Експортер Prometheus** | Метрики postfix-exporter на локальному порту 9154 | **Налаштовано та впроваджено** ✅ |
-| **Міграція на Rspamd** | Високопродуктивна заміна SpamAssassin з підписом DKIM | **Налаштовано та впроваджено** ✅ |
+- **Autoconfig & Autodiscover**: Автоматичне налаштування поштових клієнтів (Thunderbird/Outlook) працює через сервіс `mail-autoconfig` на локальному порту `8000`.
+- **Шифровані бекапи**: Інкрементне резервне копіювання скриньок на хмару через Restic (запуск через `./backup-mail.sh`).
+- **Експортер Prometheus**: Метрики пошти успішно транслюються на локальному порту `9154` через `sergeymakinen/postfix_exporter` з правами root.
+- **Міграція на Rspamd**: Високопродуктивна заміна SpamAssassin та OpenDKIM повністю активована та працює.
 
 ---
 
