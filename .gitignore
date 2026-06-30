@@ -1,0 +1,6 @@
+docker-data/
+*.log
+.env
+*.key
+*.pem
+*.txt
