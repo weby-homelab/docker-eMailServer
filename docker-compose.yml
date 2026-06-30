@@ -6,7 +6,7 @@ services:
     env_file: mailserver.env
     ports:
       - "25:25"
-      - "143:143"
+      # - "143:143" # Disabled unencrypted IMAP
       - "465:465"
       - "587:587"
       - "993:993"
