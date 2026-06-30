@@ -407,22 +407,62 @@
                     <tr>
                       <td><span class="dns-type-badge">MX</span></td>
                       <td><code>@</code></td>
-                      <td><code id="dns-mx-val">10 mail.weby.guru.</code></td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-mx-val">10 mail.weby.guru.</code>
+                          <button class="copy-btn" data-copy-target="dns-mx-val" aria-label="Copy MX record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/></svg>
+                            <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td><span class="dns-type-badge">TXT</span></td>
                       <td><code>@</code></td>
-                      <td><code id="dns-spf-val" class="dns-cell-val">v=spf1 mx ip4:YOUR_SERVER_IP -all</code></td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-spf-val" class="dns-cell-val">v=spf1 mx ip4:YOUR_SERVER_IP -all</code>
+                          <button class="copy-btn" data-copy-target="dns-spf-val" aria-label="Copy SPF record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/></svg>
+                            <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td><span class="dns-type-badge">TXT</span></td>
-                      <td><code id="dns-dkim-host-val">mail._domainkey.weby.guru.</code></td>
-                      <td><code id="dns-dkim-key-val" class="dns-cell-val">v=DKIM1; k=rsa; p=...</code></td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-dkim-host-val">mail._domainkey.weby.guru.</code>
+                        </div>
+                      </td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-dkim-key-val" class="dns-cell-val">v=DKIM1; k=rsa; p=...</code>
+                          <button class="copy-btn" data-copy-target="dns-dkim-key-val" aria-label="Copy DKIM record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/></svg>
+                            <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                     <tr>
                       <td><span class="dns-type-badge">TXT</span></td>
-                      <td><code id="dns-dmarc-host-val">_dmarc.weby.guru.</code></td>
-                      <td><code id="dns-dmarc-val" class="dns-cell-val">v=DMARC1; p=reject; pct=100; rua=mailto:dmarc@weby.guru</code></td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-dmarc-host-val">_dmarc.weby.guru.</code>
+                        </div>
+                      </td>
+                      <td>
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                          <code id="dns-dmarc-val" class="dns-cell-val">v=DMARC1; p=reject; pct=100; rua=mailto:dmarc@weby.guru</code>
+                          <button class="copy-btn" data-copy-target="dns-dmarc-val" aria-label="Copy DMARC record">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/></svg>
+                            <div class="copy-tooltip"><span class="lang-en">Copy</span><span class="lang-ua">Копіювати</span></div>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   </tbody>
                 </table>

@@ -749,11 +749,11 @@ section.tab-section {
 
 .dns-cell-val {
   font-family: var(--font-mono);
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 380px;
+  overflow-x: auto;
   white-space: nowrap;
-  display: block;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Security Hardening Features */
