@@ -57,6 +57,8 @@ graph TD
 - **[docker-compose.yml](file:///root/geminicli/projects/mail-server/docker-compose.yml)**: Опис Docker-сервісів, портів та монтування томів.
 - **[mailserver.env](file:///root/geminicli/projects/mail-server/mailserver.env)**: Змінні середовища для налаштування безпеки (TLS, включені модулі).
 - **[setup-accounts.sh](file:///root/geminicli/projects/mail-server/setup-accounts.sh)**: Скрипт автоматичного створення поштових скриньок та генерації DKIM-ключів.
+- **[backup-mail.sh](file:///root/geminicli/projects/mail-server/backup-mail.sh)**: Допоміжний скрипт автоматичного резервного копіювання за допомогою Restic.
+- **[docs/plans/2026-06-30-mailserver-modernization.md](file:///root/geminicli/projects/mail-server/docs/plans/2026-06-30-mailserver-modernization.md)**: Документ планування та дорожня карта модернізації сервера.
 
 ---
 
@@ -65,8 +67,8 @@ graph TD
 Поштовий сервер працює з максимальними налаштуваннями безпеки "з коробки":
 1. **Modern TLS**: Параметр `TLS_LEVEL=modern` дозволяє використання лише протоколів TLS 1.3 або стійких шифрів TLS 1.2.
 2. **Захист від брутфорсу**: Включено **Fail2Ban** (`ENABLE_FAIL2BAN=1`) для динамічного блокування IP-адрес зловмисників.
-3. **Фільтрація спаму**: Працює **SpamAssassin** (`ENABLE_SPAMASSASSIN=1`) для перевірки вхідної пошти.
-4. **SSL/TLS сертифікати**: Монтуються безпосередньо з लेट्स Let's Encrypt (`/etc/letsencrypt`) хост-системи.
+3. **Фільтрація спаму**: Працює сучасний та швидкий фільтр **Rspamd** (`ENABLE_RSPAMD=1`) як заміна SpamAssassin.
+4. **SSL/TLS сертифікати**: Монтуються безпосередньо з Let's Encrypt (`/etc/letsencrypt`) хост-системи.
 5. **Тільки безпечні порти**:
    - `25`: SMTP (пересилання між серверами)
    - `465`: SMTPS (SMTP поверх SSL/TLS)
@@ -92,6 +94,17 @@ graph TD
    chmod +x setup-accounts.sh
    ./setup-accounts.sh
    ```
+
+---
+
+## 📈 Дорожня карта модернізації (Середина 2026)
+
+| Напрямок покращення | Опис | Статус |
+| :--- | :--- | :--- |
+| **Autoconfig & Autodiscover** | Автоналаштування поштових клієнтів (Thunderbird/Outlook) | **Налаштовано та впроваджено** ✅ |
+| **Шифровані бекапи** | Інкрементне резервне копіювання скриньок на хмару через Restic | **Конфігуровано** (Скрипт створено) ✅ |
+| **Експортер Prometheus** | Метрики postfix-exporter на локальному порту 9154 | **Налаштовано та впроваджено** ✅ |
+| **Міграція на Rspamd** | Високопродуктивна заміна SpamAssassin з підписом DKIM | **Налаштовано та впроваджено** ✅ |
 
 ---
 

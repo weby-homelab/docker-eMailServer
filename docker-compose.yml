@@ -21,3 +21,28 @@ services:
     stop_grace_period: 1m
     cap_add:
       - NET_ADMIN
+
+  autoconfig:
+    image: wdes/mail-autodiscover-autoconfig:latest
+    container_name: mail-autoconfig
+    restart: always
+    environment:
+      - COMPANY_NAME=Srvrs Mail
+      - SUPPORT_URL=https://srvrs.top
+      - IMAP_HOST=mail.srvrs.top
+      - IMAP_PORT=993
+      - IMAP_SOCKET=SSL
+      - SMTP_HOST=mail.srvrs.top
+      - SMTP_PORT=465
+      - SMTP_SOCKET=SSL
+    ports:
+      - "127.0.0.1:8000:80"
+
+  postfix-exporter:
+    image: kumina/postfix-exporter:latest
+    container_name: mail-postfix-exporter
+    restart: always
+    volumes:
+      - ./docker-data/mail-logs:/var/log/mail:ro
+    ports:
+      - "127.0.0.1:9154:9154"
